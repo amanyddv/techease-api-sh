@@ -63,8 +63,9 @@ app.post("/addData", upload ,async function(req,res)
             password:req.body.password,
             profile:filename
         });
-        res.json(k)
+       
         await profile.collection.insertOne(k);
+        res.json(k)
     });
     
 
@@ -120,8 +121,9 @@ app.post("/addPost" ,upload,async function(req,res){
         }
         
         let k = new posts(d);
-        res.json(k)
         await posts.collection.insertOne(k);
+        res.json(k)
+
     
 });
 
@@ -129,7 +131,6 @@ app.get("/peopleInfo" ,async function(req,res){
     
      profile.find(function(req,data){
         res.json(data)
-        console.log(data)
     });
 });
 
@@ -139,15 +140,15 @@ app.post("/send" ,async function(req,res){
         email:req.body.email,
         msg:req.body.msg
     }
-    res.json(d)
     let k=new msg(d)
     await msg.collection.insertOne(k);
+    res.json(k)
+
 })
 app.get("/chat" ,async function(req,res){
     
     msg.find(function(req,data){
         res.json(data)
-        console.log(data)
     });
 })
 app.post("/forget" ,async function(req,res){
@@ -166,7 +167,6 @@ app.post("/changepic",upload ,async function(req,res){
     
     filename="empty"
     if(req.file){
-    console.log(req.body)
     filename=Date.now()+path.extname(req.file.originalname)
   await supabase.storage.from('socialmed').upload(filename, req.file.buffer,{
     headers: {
@@ -179,7 +179,6 @@ app.post("/changepic",upload ,async function(req,res){
     .from('socialmed')
     .getPublicUrl(filename, 60)
     }
-        console.log(filename)
         var myquery = {email:req.body.email} ;
         var newvalues = { $set: {profile:filename} };
         profile.updateOne(myquery,newvalues, function(err, res) {
