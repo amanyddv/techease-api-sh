@@ -64,7 +64,7 @@ app.post("/addData", upload ,async function(req,res)
             profile:filename
         });
         res.json(k)
-        k.save()
+        await profile.collection.insertOne(k);
     });
     
 
@@ -73,7 +73,7 @@ app.post("/addData", upload ,async function(req,res)
 app.post("/showData" ,async function(req,res){
     
    
-    profile.findOne({email:req.body.email,password:req.body.password},function(err,k){
+     profile.findOne({email:req.body.email,password:req.body.password},function(err,k){
        if(err){
         res.json(err)
        }
@@ -88,7 +88,7 @@ app.post("/feed",async function(req,res){
     
     console.log(req.body.email)
    
-    posts.find({email:req.body.email},function(err,feed){
+     posts.find({email:req.body.email},function(err,feed){
            
             res.json(feed)
         
@@ -121,13 +121,13 @@ app.post("/addPost" ,upload,async function(req,res){
         
         let k = new posts(d);
         res.json(k)
-        k.save()
+        await posts.collection.insertOne(k);
     
 });
 
 app.get("/peopleInfo" ,async function(req,res){
     
-    profile.find(function(req,data){
+     profile.find(function(req,data){
         res.json(data)
         console.log(data)
     });
@@ -141,7 +141,7 @@ app.post("/send" ,async function(req,res){
     }
     res.json(d)
     let k=new msg(d)
-    k.save()
+    await msg.collection.insertOne(k);
 })
 app.get("/chat" ,async function(req,res){
     
@@ -155,7 +155,7 @@ app.post("/forget" ,async function(req,res){
    
     var myquery = {email:req.body.email} && {password:req.body.oldpassword};
     var newvalues = { $set: {password:req.body.newpassword} };
-    profile.updateOne(myquery,newvalues, function(err, res) {
+     profile.updateOne(myquery,newvalues, function(err, res) {
         if (err) throw err;
         console.log("1 document updated");
       });
