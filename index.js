@@ -69,10 +69,9 @@ app.post("/postnewsletter", async function (req, res) {
 
     // Send the newsletter to each email address
     console.log(emails);
-    for (const email of emails) {
       const mailOptions = {
         from: "Techeasenewsletter@gmail.com",
-        to: email.email,
+        to: emails,
         subject: title,
         text: content,
       };
@@ -83,7 +82,7 @@ app.post("/postnewsletter", async function (req, res) {
       
       // Optional: Add a delay between sending emails to avoid rate limiting
       await new Promise(resolve => setTimeout(resolve, 1000));
-    }
+    
 
     res.status(200).json({ message: 'Newsletter saved and sent successfully' });
   } catch (error) {
