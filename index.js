@@ -57,7 +57,9 @@ app.post("/postnewsletter", async function (req, res) {
 
     // Fetch all email addresses from the database
     const emails = await Email.find({}, 'email');
-
+    const emailList = emails.map(({ email }) => email);
+    
+    console.log(emailList);
     // Create a transporter for sending emails (replace with your email configuration)
     const transporter = nodemailer.createTransport({
       service: 'gmail',
@@ -68,15 +70,13 @@ app.post("/postnewsletter", async function (req, res) {
     });
 
     // Send the newsletter to each email address
-    console.log(emails);
       const mailOptions = {
         from: "Techeasenewsletter@gmail.com",
-        to: emails,
+        to: emailList,
         subject: title,
         text: content,
       };
 
-      console.log(email.email);
 
       await transporter.sendMail(mailOptions);
       
