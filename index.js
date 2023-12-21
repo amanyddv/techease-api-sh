@@ -78,7 +78,7 @@ app.post("/postnewsletter", async function (req, res) {
     };
 
     // Send the newsletter to each email address
-    
+    console.log(emails)
     for (const email of emails) {
       mailOptions.to = email.email;
       console.log(email.email)
@@ -86,7 +86,7 @@ app.post("/postnewsletter", async function (req, res) {
       await transporter.sendMail(mailOptions);
 
       // Optional: Add a delay between sending emails to avoid rate limiting
-      // await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, 1000)); // this delays holds
     }
 
     res.status(200).json({ message: 'Newsletter saved and sent successfully' });
