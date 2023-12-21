@@ -12,9 +12,9 @@ app.use(bodyParser.json());
 app.use(cors());
 
 // Database connection
-// mongoose.connect("mongodb+srv://vercel-admin-user-63b8143875b0f4614e499e12:G6FPKHcoZnC74XOu@cluster0.3bawqzz.mongodb.net/newsletterdb?retryWrites=true&w=majority", { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect("mongodb+srv://vercel-admin-user-63b8143875b0f4614e499e12:G6FPKHcoZnC74XOu@cluster0.3bawqzz.mongodb.net/newsletterdbtemp?retryWrites=true&w=majority", { useNewUrlParser: true, useUnifiedTopology: true });
 
-mongoose.connect("mongodb://localhost:27017/newsletterdb")
+// mongoose.connect("mongodb://localhost:27017/newsletterdb")
 
 // Define the newsletter schema and model
 const newsletterSchema = mongoose.Schema({
@@ -86,7 +86,7 @@ app.post("/postnewsletter", async function (req, res) {
       await transporter.sendMail(mailOptions);
 
       // Optional: Add a delay between sending emails to avoid rate limiting
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // await new Promise(resolve => setTimeout(resolve, 1000));
     }
 
     res.status(200).json({ message: 'Newsletter saved and sent successfully' });
