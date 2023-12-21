@@ -14,6 +14,8 @@ app.use(cors());
 // Database connection
 mongoose.connect("mongodb+srv://vercel-admin-user-63b8143875b0f4614e499e12:G6FPKHcoZnC74XOu@cluster0.3bawqzz.mongodb.net/newsletterdb?retryWrites=true&w=majority", { useNewUrlParser: true, useUnifiedTopology: true });
 
+// mongoose.connect("mongodb://localhost:27017/newsletterdb")
+
 // Define the newsletter schema and model
 const newsletterSchema = mongoose.Schema({
   title: { type: String },
@@ -61,22 +63,25 @@ app.post("/postnewsletter", async function (req, res) {
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        user: "techeasenewsletter@gmail.com",
-        pass: "yitj prjp rqzf zeyv", 
+        user: "Techeasenewsletter@gmail.com",
+        pass: "hxkg gtli wgmb pncb", 
+        
 
       },
     });
 
     // Define the email content
     const mailOptions = {
-      from: 'techeasenewsletter@gmail.com',
+      from:"Techeasenewsletter@gmail.com",
       subject: title,
       text: content,
     };
 
     // Send the newsletter to each email address
+    
     for (const email of emails) {
       mailOptions.to = email.email;
+      console.log(email.email)
       
       await transporter.sendMail(mailOptions);
 
