@@ -38,7 +38,7 @@ const emailSchema = new mongoose.Schema({
 // Route for posting newsletter
 app.post("/postnewsletter", async function (req, res) {
   console.log(req.body);
-  
+
   try {
     const { title, content } = req.body;
 
@@ -64,28 +64,25 @@ app.post("/postnewsletter", async function (req, res) {
       auth: {
         user: "Techeasenewsletter@gmail.com",
         pass: "hxkg gtli wgmb pncb", 
-        
-
       },
     });
 
-    // Define the email content
-    const mailOptions = {
-      from:"Techeasenewsletter@gmail.com",
-      subject: title,
-      text: content,
-    };
-
     // Send the newsletter to each email address
-    console.log(emails)
+    console.log(emails);
     for (const email of emails) {
-      mailOptions.to = email.email;
-      console.log(email.email)
-      
+      const mailOptions = {
+        from: "Techeasenewsletter@gmail.com",
+        to: email.email,
+        subject: title,
+        text: content,
+      };
+
+      console.log(email.email);
+
       await transporter.sendMail(mailOptions);
 
       // Optional: Add a delay between sending emails to avoid rate limiting
-      await new Promise(resolve => setTimeout(resolve, 1000)); // this delays holds
+      await new Promise(resolve => setTimeout(resolve, 1000));
     }
 
     res.status(200).json({ message: 'Newsletter saved and sent successfully' });
@@ -93,7 +90,6 @@ app.post("/postnewsletter", async function (req, res) {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
-
 });
 
 // Route for retrieving newsletter feeds
