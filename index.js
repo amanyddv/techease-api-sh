@@ -105,6 +105,9 @@ app.get("/newsletterfeeds", function (req, res) {
       res.status(500).send("Internal Server Error");
     });
 });
+app.get("/",function(req,res){
+    res.send("work")
+})
 
 app.post("/subscribe", async function (req, res) {
     console.log("Fetching newsletter feeds");
