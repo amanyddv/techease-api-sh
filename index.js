@@ -79,7 +79,12 @@ app.post("/postnewsletter", async function (req, res) {
 
       console.log(email.email);
 
-      await transporter.sendMail(mailOptions);
+      try {
+        await transporter.sendMail(mailOptions);
+      } catch (error) {
+        console.error(`Error sending email to ${email.email}:`, error);
+      }
+      console.log(`Waiting for 1000 milliseconds before the next email`);
 
       // Optional: Add a delay between sending emails to avoid rate limiting
       await new Promise(resolve => setTimeout(resolve, 1000));
