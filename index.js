@@ -61,14 +61,15 @@ app.post("/postnewsletter", async function (req, res) {
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        user: "amanydddv@gmail.com",
-        pass: "pszf dwnf lrps yeku",
+        user: "techeasenewsletter@gmail.com",
+        pass: "yitj prjp rqzf zeyv", 
+
       },
     });
 
     // Define the email content
     const mailOptions = {
-      from: 'amanydddv@gmail.com',
+      from: 'techeasenewsletter@gmail.com',
       subject: "🚀 TechEase NewsLetter ( "+title +")",
       text: content,
     };
