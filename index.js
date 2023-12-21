@@ -11,7 +11,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cors());
 
-mongoose.connect("mongodb+srv://vercel-admin-user-63b8143875b0f4614e499e12:G6FPKHcoZnC74XOu@cluster0.3bawqzz.mongodb.net/newsletterdbtemp?retryWrites=true&w=majority", { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect("mongodb+srv://vercel-admin-user-63b8143875b0f4614e499e12:G6FPKHcoZnC74XOu@cluster0.3bawqzz.mongodb.net/newsletterdb?retryWrites=true&w=majority", { useNewUrlParser: true, useUnifiedTopology: true });
 
 // mongoose.connect("mongodb://localhost:27017/newsletterdb")
 
@@ -79,13 +79,8 @@ app.post("/postnewsletter", async function (req, res) {
 
       console.log(email.email);
 
-      try {
-        await transporter.sendMail(mailOptions);
-      } catch (error) {
-        console.error(`Error sending email to ${email.email}:`, error);
-      }
-      console.log(`Waiting for 1000 milliseconds before the next email`);
-
+      await transporter.sendMail(mailOptions);
+      
       // Optional: Add a delay between sending emails to avoid rate limiting
       await new Promise(resolve => setTimeout(resolve, 1000));
     }
