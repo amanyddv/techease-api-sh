@@ -70,7 +70,7 @@ app.post("/postnewsletter", async function (req, res) {
     // Define the email content
     const mailOptions = {
       from: 'techeasenewsletter@gmail.com',
-      subject: "🚀 TechEase NewsLetter ( "+title +")",
+      subject: title,
       text: content,
     };
 
