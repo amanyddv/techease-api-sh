@@ -1,198 +1,137 @@
+const express = require("express");
+const bodyParser = require("body-parser");
+const cors = require("cors");
+const mongoose = require("mongoose");
+const nodemailer = require('nodemailer');
 
+const app = express();
 
-var ex=require("express");
-var app=ex()
-const { createClient } = require('@supabase/supabase-js')
-const bodyParser =require("body-parser")
-app.use(bodyParser.urlencoded({extended:false}))
-app.use(bodyParser.json())
-const path =require('path')
-const cors=require("cors");
+// Middleware
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 app.use(cors());
 
+// Database connection
+mongoose.connect("mongodb+srv://vercel-admin-user-63b8143875b0f4614e499e12:G6FPKHcoZnC74XOu@cluster0.3bawqzz.mongodb.net/newsletterdb?retryWrites=true&w=majority", { useNewUrlParser: true, useUnifiedTopology: true });
 
-const multer = require("multer");
+// Define the newsletter schema and model
+const newsletterSchema = mongoose.Schema({
+  title: { type: String },
+  content: { type: String }
+});
 
-var upload = multer({
-}).single('file');
+const Newsletter = mongoose.model("newsletterCollection", newsletterSchema);
 
+const emailSchema = new mongoose.Schema({
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+      lowercase: true,
+    },
+  });
+  
+  const Email = mongoose.model('Email', emailSchema);
 
+// Route for posting newsletter
+app.post("/postnewsletter", async function (req, res) {
+  console.log(req.body);
+  
+  try {
+    const { title, content } = req.body;
 
-mongoose=require("mongoose");
-const supabase = createClient(
- "https://oealfnepepsbsdmsnqkq.supabase.co","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9lYWxmbmVwZXBzYnNkbXNucWtxIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY3NDExMzAxNSwiZXhwIjoxOTg5Njg5MDE1fQ.z0WBLNt1hrWgrAuANfZ9Ck8jqNICuQ7ptB5IVsDzMO8"
-);
-
-uri="mongodb+srv://vercel-admin-user-63b8143875b0f4614e499e12:G6FPKHcoZnC74XOu@cluster0.3bawqzz.mongodb.net/socialmed?retryWrites=true&w=majority"
-async function run(){
-await mongoose.connect(uri);
-}
-
-
-
-
-prosocialmedchema=mongoose.Schema({name:{type:String},email:{type:String},password:{type:String},profile:{type:String}});
-var profile=mongoose.model("profile",prosocialmedchema);
-
-prosocialmedchema2=mongoose.Schema({email:{type:String},post:{type:String},comment:{type:String}});
-var posts=mongoose.model("posts",prosocialmedchema2);
-
-msg=mongoose.Schema({email:{type:String},msg:{type:String}})
-var msg=mongoose.model("msg",msg);
-
-app.post("/addData", upload ,async function(req,res) 
-{
-    filename="empty"
-    if(req.file){
-    filename=Date.now()+path.extname(req.file.originalname)
-  await supabase.storage.from('socialmed').upload(filename, req.file.buffer,{
-    headers: {
-      'Content-Type': req.file.mimetype,
-      'Content-Length': req.file.buffer
-    }})  
-
-    const  url =  await supabase
-    .storage
-    .from('socialmed')
-    .getPublicUrl(filename, 60)
-
+    // Validate if title and content are provided
+    if (!title || !content) {
+      return res.status(400).json({ error: 'Title and content are required' });
     }
-        const k = new profile({
-            name:req.body.name,
-            email:req.body.email,
-            password:req.body.password,
-            profile:filename
-        });
-       
-        await profile.collection.insertOne(k);
-        res.json(k)
+
+    // Save the newsletter to the database
+    const newsletterObject = new Newsletter({
+      title,
+      content,
     });
-    
 
+    await newsletterObject.save();
 
+    // Fetch all email addresses from the database
+    const emails = await Email.find({}, 'email');
 
-app.post("/showData" ,async function(req,res){
-    
-   
-     profile.findOne({email:req.body.email,password:req.body.password},function(err,k){
-       if(err){
-        res.json(err)
-       }
-       else{
-       res.json(k)
-       }
+    // Create a transporter for sending emails (replace with your email configuration)
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: "amanydddv@gmail.com",
+        pass: "pszf dwnf lrps yeku",
+      },
     });
-    
-});
 
-app.post("/feed",async function(req,res){
-    
-    console.log(req.body.email)
-   
-     posts.find({email:req.body.email},function(err,feed){
-           
-            res.json(feed)
-        
-    });
-});
+    // Define the email content
+    const mailOptions = {
+      from: 'amanydddv@gmail.com',
+      subject: "🚀 TechEase NewsLetter ( "+title +")",
+      text: content,
+    };
 
-app.post("/addPost" ,upload,async function(req,res){
-    
+    // Send the newsletter to each email address
+    for (const email of emails) {
+      mailOptions.to = email.email;
+      
+      await transporter.sendMail(mailOptions);
 
-    filename="empty"
-    if(req.file){
-    console.log(req.body)
-    filename=Date.now()+path.extname(req.file.originalname)
-  await supabase.storage.from('socialmed').upload(filename, req.file.buffer,{
-    headers: {
-      'Content-Type': req.file.mimetype,
-      'Content-Length': req.file.buffer
-    }})  
-
-    const  url =  await supabase
-    .storage
-    .from('socialmed')
-    .getPublicUrl(filename, 60)
+      // Optional: Add a delay between sending emails to avoid rate limiting
+      await new Promise(resolve => setTimeout(resolve, 1000));
     }
-        d={
-            email:req.body.email,
-            comment:req.body.comment,
-            post:filename
-        }
-        
-        let k = new posts(d);
-        await posts.collection.insertOne(k);
-        res.json(k)
 
-    
+    res.status(200).json({ message: 'Newsletter saved and sent successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+
 });
 
-app.get("/peopleInfo" ,async function(req,res){
-    
-     profile.find(function(req,data){
-        res.json(data)
-    });
-});
-
-app.post("/send" ,async function(req,res){
-    
-    d={
-        email:req.body.email,
-        msg:req.body.msg
-    }
-    let k=new msg(d)
-    await msg.collection.insertOne(k);
-    res.json(k)
-
-})
-app.get("/chat" ,async function(req,res){
-    
-    msg.find(function(req,data){
-        res.json(data)
-    });
-})
-app.post("/forget" ,async function(req,res){
-    
-   
-    var myquery = {email:req.body.email} && {password:req.body.oldpassword};
-    var newvalues = { $set: {password:req.body.newpassword} };
-     profile.updateOne(myquery,newvalues, function(err, res) {
-        if (err) throw err;
-        console.log("1 document updated");
-      });
+// Route for retrieving newsletter feeds
+app.get("/newsletterfeeds", function (req, res) {
+  console.log("Fetching newsletter feeds");
+  
+  Newsletter.find()
+    .then((data) => {
+      res.json(data);
+      console.log(data);
     })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).send("Internal Server Error");
+    });
+});
+
+app.post("/subscribe", async function (req, res) {
+    console.log("Fetching newsletter feeds");
     
-
-app.post("/changepic",upload ,async function(req,res){
+    try {
+        const { email } = req.body;
     
-    filename="empty"
-    if(req.file){
-    filename=Date.now()+path.extname(req.file.originalname)
-  await supabase.storage.from('socialmed').upload(filename, req.file.buffer,{
-    headers: {
-      'Content-Type': req.file.mimetype,
-      'Content-Length': req.file.buffer
-    }})  
+        // Validate if the email is provided
+        if (!email) {
+          return res.status(400).json({ error: 'Email address is required' });
+        }
+    
+        // Create a new Email object
+        const newEmail = new Email({ email });
+    
+        // Save the email to the database
+        await newEmail.save();
+    
+        res.status(201).json({ message: 'Email address stored successfully' });
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+      }
+  });
 
-    const  url =  await supabase
-    .storage
-    .from('socialmed')
-    .getPublicUrl(filename, 60)
-    }
-        var myquery = {email:req.body.email} ;
-        var newvalues = { $set: {profile:filename} };
-        profile.updateOne(myquery,newvalues, function(err, res) {
-            if (err) throw err;
-            console.log("1 document updated");
-          });
-        
-          res.json(filename)
-
-        });
-        
- 
-
-
-run()
-app.listen(7000,function(){
-    console.log("server is running");});
+// Start the server
+const PORT = 7000;
+app.listen(PORT, function () {
+  console.log(`Server is running on port ${PORT}`);
+});
