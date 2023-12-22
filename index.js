@@ -112,28 +112,53 @@ app.get("/",function(req,res){
 })
 
 app.post("/subscribe", async function (req, res) {
-    console.log("Fetching newsletter feeds");
-    
-    try {
-        const { email } = req.body;
-    
-        // Validate if the email is provided
-        if (!email) {
-          return res.status(400).json({ error: 'Email address is required' });
-        }
-    
-        // Create a new Email object
-        const newEmail = new Email({ email });
-    
-        // Save the email to the database
-        await newEmail.save();
-    
-        res.status(201).json({ message: 'Email address stored successfully' });
-      } catch (error) {
+  console.log("Fetching newsletter feeds");
+
+  try {
+    const { email } = req.body;
+
+    // Validate if the email is provided
+    if (!email) {
+      return res.status(400).json({ error: 'Email address is required' });
+    }
+
+    // Create a new Email object
+    const newEmail = new Email({ email });
+
+    // Save the email to the database
+    await newEmail.save();
+
+    // Send a thank you email to the subscriber
+    const transporter = nodemailer.createTransport({
+      // Use the appropriate configuration for your email service
+      service: 'gmail',
+      auth: {
+        user: "Techeasenewsletter@gmail.com",
+        pass: "hxkg gtli wgmb pncb",
+      }
+    });
+
+    const mailOptions = {
+      from: "techeasenewsletter@gmail.com",
+      to: email,
+      subject: 'Thank You for Subscribing! 🎉',
+      text: 'Thank you for subscribing to our Techease newsletter. We appreciate your interest! 🙌'
+    };
+
+   await transporter.sendMail(mailOptions, function(error, info) {
+      if (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal Server Error' });
+      } else {
+        console.log('Thank you email sent: ' + info.response);
+        res.status(201).json({ message: 'Email address stored successfully' });
       }
-  });
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 
 // Start the server
 const PORT = 7000;
