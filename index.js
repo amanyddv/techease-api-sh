@@ -53,7 +53,7 @@ app.post("/postnewsletter", async function (req, res) {
       content,
     });
 
-    await newsletterObject.save();
+    // await newsletterObject.save();
 
     // Fetch all email addresses from the database
     const emails = await Email.find({}, 'email');
@@ -73,7 +73,7 @@ app.post("/postnewsletter", async function (req, res) {
 
       const mailOptions = {
         from: "Techeasenewsletter@gmail.com",
-        to:"technewsletter@gmail.com",
+        to:"techeasenewsletter@gmail.com",
         bcc: emailList,
         subject: title,
         html: content,
