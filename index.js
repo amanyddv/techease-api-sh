@@ -76,7 +76,7 @@ app.post("/postnewsletter", async function (req, res) {
         to:"technewsletter@gmail.com",
         bcc: emailList,
         subject: title,
-        text: content,
+        html: content,
       };
 
 
