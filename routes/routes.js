@@ -19,9 +19,7 @@ router.get("/",function(req,res){
 });
 
 router.get('/newsletterfeeds',newsletterfeeds) 
-router.get('/', function (req, res) {
-    res.send('work');
-  });
+
   
   router.post('/subscribe', subscribe)
 module.exports = router;
