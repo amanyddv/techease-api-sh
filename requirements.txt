@@ -1,0 +1,7 @@
+express
+body-parser
+cors
+mongoose
+nodemailer
+nodemon
+env
