@@ -72,8 +72,20 @@ const transporter = nodemailer.createTransport({
         from: process.env.EMAIL_USER, // sender address
         to: email,
         subject: 'OTP Verification',
-        text: `Your OTP is: ${otp}`,
+        html: `
+        <html>
+          <body>
+            <div style="text-align: center; padding: 20px;">
+              <h1>🌟 Hello!</h1>
+              <p>Thank you for registering. Your OTP (One-Time Password) for verification is: <strong>${otp}</strong>.</p>
+              <p>🕒 Please use this code within the next 60 seconds to complete the registration process.</p>
+              <p style="font-size: 14px; color: #777;">(This OTP is valid for a short duration for security reasons.)</p>
+            </div>
+          </body>
+        </html>
+      `,
       });
+      
     } catch (error) {
       throw new Error('Failed to send OTP via email');
     }
